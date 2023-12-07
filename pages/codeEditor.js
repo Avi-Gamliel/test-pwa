@@ -28,15 +28,15 @@ function CodeEditor() {
     const myTheme = createTheme({
         theme: 'dark',
         settings: {
-            background: '#333740',
+            background: '#0f0e15',
             backgroundImage: '',
             foreground: '#75baff',
             caret: '#5d00ff',
             selection: '#036dd626',
             selectionMatch: '#036dd626',
-            lineHighlight: '#333740',
+            lineHighlight: '#0f0e15',
             gutterBorder: '1px solid #ffffff10',
-            gutterBackground: '#333740',
+            gutterBackground: '#0f0e15',
             gutterForeground: '#545454',
         },
         styles: [
@@ -91,7 +91,11 @@ function CodeEditor() {
             }
 
         }, 50);
-        eval(valueState);
+        try {
+            eval(valueState);
+        } catch (error) {
+
+        }
         console.log = originalLog
     };
     const onChange = useCallback((val, viewUpdate) => {
@@ -106,7 +110,7 @@ function CodeEditor() {
     }, [logsState])
     return (
         <div style={{
-            background: themeStyle == "bright" ? "white" : '#2d2c34',
+            background: themeStyle == "bright" ? "white" : '#0f0e15',
             width: '100%', height: '100%', display: 'flex',
             paddingTop: 20,
             paddingRight: 20,
@@ -117,18 +121,6 @@ function CodeEditor() {
                 background: themeStyle == "bright" ? "rgba(240,240,240,1)" : null,
                 width: '100%', height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 10,
             }}>
-                <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', gap: 10 }}>
-                    <div onClick={() => setSetting(prev => {
-                        prev.fontSize = prev.fontSize - 1 < 0 ? 0 : prev.fontSize - 1
-                        return { ...prev }
-                    })}><FaMinus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
-                    <div
-                        onClick={() => setSetting(prev => {
-                            prev.fontSize = prev.fontSize + 1 > 50 ? 50 : prev.fontSize + 1
-                            return { ...prev }
-                        })}
-                    ><FaPlus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
-                </div>
                 {/* <select
                     style={{ width: 100 }}
                     value={selectTheme}
@@ -147,12 +139,19 @@ function CodeEditor() {
                     })}
                 </select> */}
             </div>
-            <div style={{ width: '100%', borderRadius: 25, paddingTop: 20, paddingBottom: 20,
-            //  height: 'calc(50% - 90px)',
-             height: '100%',
-              background: '#333740', borderRadius: 25, display: 'block' }}>
+            <div style={{
+                width: '100%', borderRadius: 25, paddingTop: 20, paddingBottom: 20,
+                //  height: 'calc(50% - 90px)',
+                height: '100%',
+                maxHeight: !toggleTerminal ? '100vh' : '50%',
+                background: '#0f0e15', borderRadius: 25, display: 'block'
+            }}>
                 <CodeMirror
-                    style={{ width: '100%', borderRadius: 25, border: '2px solid #333740', boxShadow: 'none', outline: 'none', height: '100%', fontSize: settings.fontSize }}
+                    style={{
+                        width: '100%', borderRadius: 25,
+                        //  border: '2px solid #333740',
+                        boxShadow: 'none', outline: 'none', height: '100%', fontSize: settings.fontSize
+                    }}
                     value={valueState}
                     height="100%"
 
@@ -178,10 +177,21 @@ function CodeEditor() {
                         <FaPlayCircle color={themeStyle == "bright" ? "black" : 'white'} size={45} />
                     </div>
                 </div> */}
-                <div style={{ display: 'flex', paddingRight: 10, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: '100%', gap: 10 }}>
+                <div style={{ display: 'flex', paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', height: '100%', width:'100%',gap: 10 }}>
 
 
-
+                <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', gap: 10 }}>
+                    <div onClick={() => setSetting(prev => {
+                        prev.fontSize = prev.fontSize - 1 < 0 ? 0 : prev.fontSize - 1
+                        return { ...prev }
+                    })}><FaMinus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
+                    <div
+                        onClick={() => setSetting(prev => {
+                            prev.fontSize = prev.fontSize + 1 > 50 ? 50 : prev.fontSize + 1
+                            return { ...prev }
+                        })}
+                    ><FaPlus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
+                </div>
                 </div>
             </div>
             {
@@ -196,9 +206,9 @@ function CodeEditor() {
                     //   height: 'calc(50% - 90px)', 
                     justifyContent: 'center', alignItems: 'center',
                     //  position: 'absolute', bottom: 0, left: 0,
-                      borderRadius: 25
+                    borderRadius: 25
                 }}>
-                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : '#333740', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <div style={{ height: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                             <div style={{ width: 50, display: 'flex', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
                                 <div
@@ -207,7 +217,7 @@ function CodeEditor() {
                                 >
                                     <FaRegTrashAlt color={themeStyle == "bright" ? "black" : "white"} size={20} />
                                 </div>
-                            
+
                             </div>
                             <div style={{ height: 5, width: 100, background: 'white', borderRadius: 25 }}></div>
                             <div style={{ width: 50, height: '100%' }}></div>
@@ -222,9 +232,9 @@ function CodeEditor() {
                             // background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.09)', 
                             height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
                         }}>
-                            {logsState.map(p => {
+                            {logsState.map((p, i) => {
                                 if (p.type == "info") {
-                                    return <div style={{ color: themeStyle == "bright" ? "black" : "white" }}>{p.msg[0]}</div>
+                                    return <div key={i} style={{ color: themeStyle == "bright" ? "black" : "white" }}>{p.msg[0]}</div>
                                 }
                             })}
                         </div>
@@ -259,7 +269,7 @@ function CodeEditor() {
                 </div>
                 <div style={{ width: '100%', display: 'flex' }}>
 
-                    <div style={{ width: '50%',display:'flex',justifyContent:'center', alignItems:'center', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#333740', borderTopRightRadius: 50 }}>
+                    <div style={{ width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopRightRadius: 50 }}>
                         <div
                             //  style={{ position: 'absolute', top: 0, right: 0 }}
                             onClick={() => setToggleTerminal(prev => !prev)}
@@ -268,7 +278,7 @@ function CodeEditor() {
                         </div>
                     </div>
                     <div style={{ width: 100, height: 70, background: '', borderEndStartRadius: 50 }}></div>
-                    <div style={{ width: '50%', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#333740', borderTopLeftRadius: 50 }} ></div>
+                    <div style={{ width: '50%', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopLeftRadius: 50 }} ></div>
                 </div>
                 {/* <svg style={{ filter: 'drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.935))' }} width="100%" height="80px" viewBox="0 0 600 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M346.446 18.5513C339.078 36.9805 321.059 50 300 50C278.941 50 260.922 36.9805 253.554 18.5513C249.659 8.80762 241.493 0 231 0H19C8.50659 0 0 8.50659 0 19V47V81V100H19H581H600V81V47V19C600 8.50659 591.493 0 581 0H369C358.507 0 350.341 8.80762 346.446 18.5513Z" fill="#333740" />
