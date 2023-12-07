@@ -1139,7 +1139,7 @@
   resolved "https://registry.npmjs.org/@lezer/common/-/common-1.1.1.tgz"
   integrity sha512-aAPB9YbvZHqAW+bIwiuuTDGB4DG0sYNRObGLxud8cW7osw1ZQxfDuTZ8KQiqfZ0QJGcR34CvpTMDXEyo/+Htgg==
 
-"@lezer/highlight@^1.0.0", "@lezer/highlight@^1.1.3":
+"@lezer/highlight@^1.0.0", "@lezer/highlight@^1.1.3", "@lezer/highlight@^1.2.0":
   version "1.2.0"
   resolved "https://registry.npmjs.org/@lezer/highlight/-/highlight-1.2.0.tgz"
   integrity sha512-WrS5Mw51sGrpqjlh3d4/fOwpEV2Hd3YOkp9DBt4k8XZQcoTHZFB7sx030A6OcahF4J1nDQAa3jXlTVVYH50IFA==
@@ -1426,7 +1426,7 @@
   dependencies:
     "@uiw/codemirror-themes" "4.21.21"
 
-"@uiw/codemirror-themes@4.21.21":
+"@uiw/codemirror-themes@^4.21.21", "@uiw/codemirror-themes@4.21.21":
   version "4.21.21"
   resolved "https://registry.npmjs.org/@uiw/codemirror-themes/-/codemirror-themes-4.21.21.tgz"
   integrity sha512-ljVcMGdaxo75UaH+EqxJ+jLyMVVgeSfW2AKyT1VeLy+4SDpuqNQ7wq5XVxktsG6LH+OvgSFndWXgPANf4+gQcA==

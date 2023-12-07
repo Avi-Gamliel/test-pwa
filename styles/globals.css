@@ -65,3 +65,12 @@ a {
   background: #04AA6D;
   cursor: pointer;
 }
+.main-button {
+  left:calc(50% - 25px);
+  top:-20px
+  /* right: 0; */
+}
+.cm-editor {
+   
+  outline: 1px solid rgba(0,0,0,0) !important;
+}
