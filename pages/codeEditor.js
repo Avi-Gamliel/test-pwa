@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useLayoutEffect,useState, useRef, useEffect, useCallback } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { okaidia } from '@uiw/codemirror-theme-okaidia';
@@ -12,13 +12,16 @@ import { FaRegTrashAlt, FaPlayCircle } from "react-icons/fa";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { tags as t } from '@lezer/highlight';
 import { BsFillTerminalFill } from "react-icons/bs";
+import { undo, historyField } from "@codemirror/commands"
+
 
 function CodeEditor() {
     const [valueState, setValueState] = useState("console.log('hello world!');");
     const [logsState, setLogsState] = useState([])
     const [selectTheme, setSelectTheme] = useState('okaidia')
     const [themeStyle, setThemeStyle] = useState("dark")
-
+    const codeMirrorRef = useRef()
+    const deferredPrompt = useRef()
     const themes = [{ name: "okaidia", type: "dark" }, { name: "github", type: "bright" }]
     const [settings, setSetting] = useState(
         {
@@ -60,6 +63,23 @@ function CodeEditor() {
 
     const [toggleTerminal, setToggleTerminal] = useState(true)
     const logsRef = useRef([])
+    // let deferredPrompt;
+    useLayoutEffect(() => {
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevents the default mini-infobar or install dialog from appearing on mobile
+            e.preventDefault();
+            // Save the event because you'll need to trigger it later.
+            deferredPrompt.current = e;
+            // Show yourcurrent. customized install prompt for your PWA
+            // Your own UI doesn't have to be a single element, you
+            // can have buttons in different locations, or wait to prompt
+            // as part of a critical journey.
+            showInAppInstallPromotion();
+        });
+    })
+
+
     const runCode = () => {
         var originalLog = console.log;
         var logs = [];
@@ -99,18 +119,17 @@ function CodeEditor() {
         console.log = originalLog
     };
     const onChange = useCallback((val, viewUpdate) => {
-        console.log('val:', val);
         setValueState(val);
     }, []);
 
     useEffect(() => {
         const a = 12
-        debugger
-        console.log(logsState)
+   
+
     }, [logsState])
     return (
         <div style={{
-            background: themeStyle == "bright" ? "white" : '#0f0e15',
+            background: themeStyle == "bright" ? "white" : '#14131c',
             width: '100%', height: '100%', display: 'flex',
             paddingTop: 20,
             paddingRight: 20,
@@ -138,6 +157,31 @@ function CodeEditor() {
                         return <option value={t.name}>{t.type}</option>
                     })}
                 </select> */}
+
+                <div
+                    onClick={async () => {
+                        // deferredPrompt is a global variable we've been using in the sample to capture the `beforeinstallevent`
+                        deferredPrompt.current.prompt();
+                        // Find out whether the user confirmed the installation or not
+                        const { outcome } = await deferredPrompt.userChoice;
+                        // The deferredPrompt can only be used once.
+                        deferredPrompt.current = null;
+                        // Act on the user's choice
+                        if (outcome === 'accepted') {
+                            console.log('User accepted the install prompt.');
+                        } else if (outcome === 'dismissed') {
+                            console.log('User dismissed the install prompt');
+                        }
+                    }}
+                    style={{ width: 100, display: 'flex', justifyContent: 'center', alignItems: 'center', height: 30, borderRadius: 25, background: 'orange' }} >
+                    <span style={{
+                        color: 'white'
+                    }}
+                    >
+                        install
+                    </span>
+
+                </div>
             </div>
             <div style={{
                 width: '100%', borderRadius: 25, paddingTop: 20, paddingBottom: 20,
@@ -154,7 +198,7 @@ function CodeEditor() {
                     }}
                     value={valueState}
                     height="100%"
-
+                    ref={codeMirrorRef}
                     extensions={[javascript({ jsx: true })]}
                     theme={myTheme}
                     // theme={selectTheme == "abcdef" ? abcdef : selectTheme == "okaidia" ? okaidia : selectTheme == "github" ? github : okaidia}
@@ -177,21 +221,21 @@ function CodeEditor() {
                         <FaPlayCircle color={themeStyle == "bright" ? "black" : 'white'} size={45} />
                     </div>
                 </div> */}
-                <div style={{ display: 'flex', paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', height: '100%', width:'100%',gap: 10 }}>
+                <div style={{ display: 'flex', paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', height: '100%', width: '100%', gap: 10 }}>
 
 
-                <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', gap: 10 }}>
-                    <div onClick={() => setSetting(prev => {
-                        prev.fontSize = prev.fontSize - 1 < 0 ? 0 : prev.fontSize - 1
-                        return { ...prev }
-                    })}><FaMinus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
-                    <div
-                        onClick={() => setSetting(prev => {
-                            prev.fontSize = prev.fontSize + 1 > 50 ? 50 : prev.fontSize + 1
+                    <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', gap: 10 }}>
+                        <div onClick={() => setSetting(prev => {
+                            prev.fontSize = prev.fontSize - 1 < 0 ? 0 : prev.fontSize - 1
                             return { ...prev }
-                        })}
-                    ><FaPlus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
-                </div>
+                        })}><FaMinus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
+                        <div
+                            onClick={() => setSetting(prev => {
+                                prev.fontSize = prev.fontSize + 1 > 50 ? 50 : prev.fontSize + 1
+                                return { ...prev }
+                            })}
+                        ><FaPlus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
+                    </div>
                 </div>
             </div>
             {
@@ -208,7 +252,7 @@ function CodeEditor() {
                     //  position: 'absolute', bottom: 0, left: 0,
                     borderRadius: 25
                 }}>
-                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', maxHeight: '50%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <div style={{ height: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                             <div style={{ width: 50, display: 'flex', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
                                 <div
@@ -228,6 +272,7 @@ function CodeEditor() {
                             // position:'absolute',
                             bottom: 0,
                             left: 0,
+                            overflow: 'scroll',
                             boxShadow: 'inset 5px 2px 10px rgba(0,0,0,0.2)',
                             // background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.09)', 
                             height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'

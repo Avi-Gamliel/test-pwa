@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.3.2",
     "@codemirror/lang-javascript": "^6.2.1",
     "@lezer/highlight": "^1.2.0",
     "@uiw/codemirror-theme-abcdef": "^4.21.21",
