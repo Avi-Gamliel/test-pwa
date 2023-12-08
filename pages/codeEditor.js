@@ -248,11 +248,12 @@ function CodeEditor() {
                     width: '100%',
                     height: '100%',
                     //   height: 'calc(50% - 90px)', 
+                    maxHeight: '50%',
                     justifyContent: 'center', alignItems: 'center',
                     //  position: 'absolute', bottom: 0, left: 0,
                     borderRadius: 25
                 }}>
-                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', maxHeight: '50%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <div style={{ height: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                             <div style={{ width: 50, display: 'flex', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
                                 <div
