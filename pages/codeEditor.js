@@ -1,4 +1,4 @@
-import React, { useLayoutEffect,useState, useRef, useEffect, useCallback } from 'react';
+import React, { useLayoutEffect, useState, useRef, useEffect, useCallback } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { okaidia } from '@uiw/codemirror-theme-okaidia';
@@ -13,20 +13,20 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import { tags as t } from '@lezer/highlight';
 import { BsFillTerminalFill } from "react-icons/bs";
 import { undo, historyField } from "@codemirror/commands"
-
-
 function CodeEditor() {
+    const [dimension, setDimension] = useState({ height: 0, width: 0 })
     const [valueState, setValueState] = useState("console.log('hello world!');");
     const [logsState, setLogsState] = useState([])
+    const [drag, setDrag] = useState(false)
     const [selectTheme, setSelectTheme] = useState('okaidia')
     const [themeStyle, setThemeStyle] = useState("dark")
     const codeMirrorRef = useRef()
     const deferredPrompt = useRef()
+    const [heightTerminal, setHeightTerminal] = useState()
+    // console.log(navigator)
     const themes = [{ name: "okaidia", type: "dark" }, { name: "github", type: "bright" }]
     const [settings, setSetting] = useState(
-        {
-            fontSize: 16
-        }
+        { fontSize: 16 }
     )
     const myTheme = createTheme({
         theme: 'dark',
@@ -60,12 +60,38 @@ function CodeEditor() {
         ],
     });
 
-
+    console.log(dimension)
     const [toggleTerminal, setToggleTerminal] = useState(true)
     const logsRef = useRef([])
+    const [statusInstall, setStatusInstall] = useState(false)
     // let deferredPrompt;
     useLayoutEffect(() => {
-
+        // const getInstallStatus = async () => {
+        //     const relatedApps = await navigator.getInstalledRelatedApps();
+        //     console.log(relatedApps
+        //     )
+        //     return relatedApps.length > 0;
+        // }
+        // getInstallStatus().then(res => {
+        console.log(window)
+        setDimension({ height: window.innerHeight, width: window.innerWidth })
+        setHeightTerminal((window.innerHeight - (50 * 2) - 40) / 2)
+        window.addEventListener("DOMContentLoaded", event => {
+            // we can move only if we are not in a browser's tab
+            isBrowser = matchMedia("(display-mode: browser)").matches;
+            if (!isBrowser) {
+                window.moveTo(16, 16);
+                window.resizeTo(800, 600);
+            }
+        });
+        window.addEventListener('appinstalled', () => {
+            // If visible, hide the install promotion
+            setStatusInstall(true)
+            hideInAppInstallPromotion();
+            // Log install to analytics
+            console.log('INSTALL: Success');
+        });
+        // })
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevents the default mini-infobar or install dialog from appearing on mobile
             e.preventDefault();
@@ -77,7 +103,10 @@ function CodeEditor() {
             // as part of a critical journey.
             showInAppInstallPromotion();
         });
-    })
+
+
+
+    }, [])
 
 
     const runCode = () => {
@@ -124,9 +153,12 @@ function CodeEditor() {
 
     useEffect(() => {
         const a = 12
-   
+
 
     }, [logsState])
+    useEffect(() => {
+        console.log(statusInstall)
+    }, [statusInstall])
     return (
         <div style={{
             background: themeStyle == "bright" ? "white" : '#14131c',
@@ -158,7 +190,7 @@ function CodeEditor() {
                     })}
                 </select> */}
 
-                <div
+                {!statusInstall && <div
                     onClick={async () => {
                         // deferredPrompt is a global variable we've been using in the sample to capture the `beforeinstallevent`
                         deferredPrompt.current.prompt();
@@ -181,13 +213,14 @@ function CodeEditor() {
                         install
                     </span>
 
-                </div>
+                </div>}
             </div>
             <div style={{
                 width: '100%', borderRadius: 25, paddingTop: 20, paddingBottom: 20,
                 //  height: 'calc(50% - 90px)',
-                height: '100%',
-                maxHeight: !toggleTerminal ? '100vh' : '50%',
+                height: !toggleTerminal ? (dimension.height - 200) : (dimension.height - heightTerminal),
+
+                // maxHeight: !toggleTerminal ? '100vh' : '50%',
                 background: '#0f0e15', borderRadius: 25, display: 'block'
             }}>
                 <CodeMirror
@@ -205,7 +238,7 @@ function CodeEditor() {
                     onChange={onChange} />
             </div>
 
-            <div style={{ width: '100%', height: 40, position: 'relative', background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : '', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ width: '100%', height: 50, position: 'relative', background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : '', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 {/* <div
                 >
 
@@ -236,6 +269,32 @@ function CodeEditor() {
                             })}
                         ><FaPlus size={20} color={themeStyle == "bright" ? "black" : "white"} /></div>
                     </div>
+                    <div
+                        //  style={{ position: 'absolute', top: 0, right: 0 }}
+                        onClick={() => setToggleTerminal(prev => !prev)}
+                    >
+                        <BsFillTerminalFill color={!toggleTerminal ? "grey" : themeStyle == "bright" ? "black" : "white"} size={25} />
+                    </div>
+                    <div className='main-button' style={{
+                        width: 50, height: 50,
+                        //  background: 'red',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 50,
+                        position: 'absolute',
+                    }}>
+
+                        <div
+                            style={{
+                                borderRadius: 50,
+                                border: '10px solid #0f0e15'
+                            }}
+                            // style={{ position: 'absolute',padding:0, margin:0,outline:'none', top: -20, left: 20,width:40,height:40, background:'white',display:'flex', justifyContent:'center', alignItems:'center', borderRadius:50, border:'2px solid black' }}
+                            onClick={() => runCode()}>
+                            <FaPlayCircle color={themeStyle == "bright" ? "black" : 'white'} size={50} />
+                        </div>
+                    </div>
                 </div>
             </div>
             {
@@ -246,14 +305,15 @@ function CodeEditor() {
                     // paddingLeft: 20,
                     //  background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(10,10,10,1)',
                     width: '100%',
-                    height: '100%',
+                    // height: '100%',
+                    height: heightTerminal - 140,
                     //   height: 'calc(50% - 90px)', 
-                    maxHeight: '50%',
+                    // maxHeight: '50%',
                     justifyContent: 'center', alignItems: 'center',
                     //  position: 'absolute', bottom: 0, left: 0,
                     borderRadius: 25
                 }}>
-                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : 'rgba(255,255,255,0.029)', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <div style={{ width: '100%', paddingLeft: 15, paddingRight: 15, borderRadius: 25, background: themeStyle == "bright" ? 'rgba(240,240,240,1)' : '#0f0e15', height: '100%', dispnterlay: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <div style={{ height: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                             <div style={{ width: 50, display: 'flex', justifyContent: 'center', gap: 10, flexDirection: 'row' }}>
                                 <div
@@ -264,7 +324,29 @@ function CodeEditor() {
                                 </div>
 
                             </div>
-                            <div style={{ height: 5, width: 100, background: 'white', borderRadius: 25 }}></div>
+                            <div style={{ height: '100%', width: '100%',
+                            
+                            display: 'flex', justifyContent: 'center', alignItems: 'center'
+                             }}
+                                onMouseDown={(e) => setDrag(true)}
+                                onMouseMove={(e) => drag && console.log(e.clientY)}
+                                onMouseLeave={(e) => drag && console.log(e.clientY)}
+                                onTouchStart={(e) => setDrag(true)}
+                                onTouchMove={(e) => {
+                                    // console.log(e.touches[0].clientY)
+                                    setHeightTerminal(dimension.height + 100 + 40 - e.touches[0].clientY)
+                                }
+                                }
+                            >
+
+                                <div style={{ height: 5, width: 100, background: 'white', borderRadius: 25 }}
+
+                                >
+
+                                    {/* {drag && <div
+                                    style={{ background: 'red', zIndex: 2, position: 'fixed', left: 0, top: 0, width: '100%', height: '100%' }}></div>} */}
+                                </div>
+                            </div>
                             <div style={{ width: 50, height: '100%' }}></div>
                         </div>
                         <div style={{
@@ -288,43 +370,40 @@ function CodeEditor() {
                 </div>
             }
 
-            <div style={{ width: '100%', position: 'absolute', bottom: -10, left: 0 }}>
-                <div className='main-button' style={{
-                    width: 50, height: 50,
-                    //  background: 'red',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 50,
-                    position: 'absolute',
-                }}>
+            <div style={{ width: '100%', background:'#0f0e15',height:80, position: 'absolute', bottom: -10, left: 0 }}>
 
-                    <div
-                        style={{
-                            // position: 'absolute',
-                            // top: -20, left: 20,
-                            borderRadius: 50,
-
-                            // boxShadow: '0px 0px 13px 3px rgba(255,255,255,0.5)'
-                        }}
-                        // style={{ position: 'absolute',padding:0, margin:0,outline:'none', top: -20, left: 20,width:40,height:40, background:'white',display:'flex', justifyContent:'center', alignItems:'center', borderRadius:50, border:'2px solid black' }}
-                        onClick={() => runCode()}>
-                        <FaPlayCircle color={themeStyle == "bright" ? "black" : 'white'} size={50} />
-                    </div>
-
-                </div>
-                <div style={{ width: '100%', display: 'flex' }}>
-
-                    <div style={{ width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopRightRadius: 50 }}>
-                        <div
-                            //  style={{ position: 'absolute', top: 0, right: 0 }}
-                            onClick={() => setToggleTerminal(prev => !prev)}
-                        >
-                            <BsFillTerminalFill color={!toggleTerminal ? "grey" : themeStyle == "bright" ? "black" : "white"} size={25} />
+                <div style={{ width: '100%',height:'100%', display: 'flex',justifyContent:'space-around', alignItems:'center' }}>
+                    {/* <div style={{ width: '50%', display: 'flex', flexDirection: 'row', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopLeftRadius: 50 }} > */}
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span >{"{"}</span>
                         </div>
-                    </div>
-                    <div style={{ width: 100, height: 70, background: '', borderEndStartRadius: 50 }}></div>
-                    <div style={{ width: '50%', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopLeftRadius: 50 }} ></div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"("}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"["}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{";"}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"."}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{'"'}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"'"}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"`"}</span>
+                        </div>
+                        <div style={{ height: 40,display:'flex', justifyContent:'center', alignItems:'center', width: 30, borderRadius:5, background: 'rgba(255,255,255,0.09)', color:'white' }}>
+                            <span>{"="}</span>
+                        </div>
+                    {/* </div> */}
+                    {/* <div style={{ width: 100, height: 70, background: '', borderEndStartRadius: 50 }}></div> */}
+                    {/* <div style={{ width: '50%', boxShadow: "0px 0px 15px rgba(0,0,0,0.3)", height: 70, background: '#0f0e15', borderTopLeftRadius: 50 }} ></div> */}
                 </div>
                 {/* <svg style={{ filter: 'drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.935))' }} width="100%" height="80px" viewBox="0 0 600 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M346.446 18.5513C339.078 36.9805 321.059 50 300 50C278.941 50 260.922 36.9805 253.554 18.5513C249.659 8.80762 241.493 0 231 0H19C8.50659 0 0 8.50659 0 19V47V81V100H19H581H600V81V47V19C600 8.50659 591.493 0 581 0H369C358.507 0 350.341 8.80762 346.446 18.5513Z" fill="#333740" />

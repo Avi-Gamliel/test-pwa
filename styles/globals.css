@@ -1,14 +1,13 @@
 html,
 body {
- 
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
- 
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #14131c;
 }
 
 a {
@@ -24,6 +23,7 @@ a {
   html {
     color-scheme: dark;
   }
+
   body {
     color: white;
     background: black;
@@ -65,12 +65,14 @@ a {
   background: #04AA6D;
   cursor: pointer;
 }
+
 .main-button {
-  left:calc(50% - 25px);
-  top:-20px
-  /* right: 0; */
+  left: calc(50% - 25px);
+  top: -20px
+    /* right: 0; */
 }
+
 .cm-editor {
-   
-  outline: 1px solid rgba(0,0,0,0) !important;
+
+  outline: 1px solid rgba(0, 0, 0, 0) !important;
 }
